@@ -77,8 +77,8 @@ class CW2Vec:
         self.stroke_max_length = stroke_max_length
         # 加载并处理数据
         self.words_num, self.word_data_ids, self.word_frequency, self.word2id, self.id2word = load_data(
-            self.input_file_name,
-            self.min_count)
+            self.input_file_name,  # resource/data/zhihu.txt
+            self.min_count)  # 5
         # 实例化skip-gram模型
         self.skip_gram_model = SkipGramModel(stroke_size,
                                              len(self.word2id),
@@ -108,9 +108,9 @@ class CW2Vec:
                          self.n_neg_sample,
                          self.word_frequency,
                          self.words_stroke_filename)
-
+        # 2 * 5 * 634125 // 500 + 1
+        #
         batch_count = 2 * self.window_size * (self.words_num - 1) // self.batch_size + 1
-
 
         for epoch in range(1, epochs + 1):
             # 初始化进度条
@@ -142,7 +142,8 @@ class CW2Vec:
                 process_bar.set_description("Epoch: %d, Iter_num: %d, Loss: %0.8f, lr: %0.6f" %
                                             (epoch,
                                              i * self.batch_size,
-                                             loss.data[0],
+                                             # loss.data[0],
+                                             loss.item(),
                                              self.optimizer.param_groups[0]['lr']))
 
                 process_bar.update(1)
@@ -164,9 +165,10 @@ class CW2Vec:
 
 
 if __name__ == '__main__':
-    w2v = CW2Vec(input_file_name=sys.argv[1],
-                 model_file=sys.argv[2],
-                 output_file_name=sys.argv[3],
-                 words_stroke_filename=sys.argv[4],
-                 stroke_path=sys.argv[5])
+    # python cw2vec.py
+    w2v = CW2Vec(input_file_name=sys.argv[1],  # resource/data/zhihu.txt
+                 model_file=sys.argv[2],  # resource/model/
+                 output_file_name=sys.argv[3],  # resource/data/cw2vec.vec
+                 words_stroke_filename=sys.argv[4],  # resource/data/word_strokes.txt
+                 stroke_path=sys.argv[5])  # resource/data/strokes.txt
     w2v.train()

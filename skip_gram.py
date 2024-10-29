@@ -25,12 +25,12 @@ class SkipGramModel(nn.Module):
             None
         """
         super(SkipGramModel, self).__init__()
-        self.emb_dimension = emb_dimension
-        self.stroke_size = stroke_size
-        self.word_size = word_size
+        self.emb_dimension = emb_dimension  # 100
+        self.stroke_size = stroke_size # 3876
+        self.word_size = word_size  # 8888
         self.use_cuda = use_cuda
         self.u_embeddings = nn.Embedding(stroke_size, emb_dimension)
-        self.v_embeddings = nn.Embedding(word_size, emb_dimension)
+        self.v_embeddings = nn.Embedding(word_size, emb_dimension)  # 感觉不对应该是stroke_size
         if use_cuda:
             self.u_embeddings.cuda()
             self.v_embeddings.cuda()
@@ -64,6 +64,8 @@ class SkipGramModel(nn.Module):
         Returns:
             Loss of this process, a pytorch variable.
         """
+        # pos_u 为[500, 363] 表示500样本，363为单词的笔画进行n-gram后的结果，不足363用0填充。
+        # 其实就是一个单词个单词的输入，对每个单词进行embedding。最后训练出来的embedding的w就是我们需要的
         emb_u = self.u_embeddings(pos_u)
         emb_u = torch.mean(emb_u, dim=1)
         emb_v = self.v_embeddings(pos_v)
